@@ -159,3 +159,14 @@ export interface LlmConfig {
   apiKey: string;
   model: string;
 }
+
+/**
+ * Uma chave na lista de fallback: o app tenta na ordem e,
+ * se uma falhar (rate limit, chave inválida, rede), passa para a próxima.
+ */
+export interface LlmKeyEntry {
+  id: string;
+  provider: LlmProviderId;
+  apiKey: string;
+  model: string; // '' = modelo padrão do provedor
+}

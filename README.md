@@ -27,9 +27,11 @@ A geração por IA usa provedores de **free tier**, configuráveis dentro do app
 | Groq | [console.groq.com](https://console.groq.com) | `llama-3.3-70b-versatile` |
 | OpenRouter | [openrouter.ai](https://openrouter.ai) | `meta-llama/llama-3.3-70b-instruct:free` |
 
-Escolha o provedor, cole a chave, (opcionalmente) informe outro modelo e use **Testar conexão**. A chave fica salva **somente no seu dispositivo** (IndexedDB) e as chamadas vão direto do navegador para o provedor.
+Você pode cadastrar **várias chaves** (inclusive de provedores diferentes) numa **fila de fallback**: o app tenta na ordem e, se uma chave falhar — limite de tokens do dia esgotado, rate limit, chave inválida ou erro de rede — passa automaticamente para a próxima. Só dá erro se todas falharem, e a mensagem informa o motivo de cada uma.
 
-Para trocar de provedor, basta selecionar outro em Ajustes — a interface (`src/llm/client.ts`) abstrai os três formatos de API. Toda resposta é pedida em JSON mode e **validada no cliente** (schema + enum canônico de músculos + equipamentos disponíveis) com até 2 tentativas de correção; se falhar, o app orienta a edição manual.
+O próprio app tem um **tutorial passo a passo** de como criar a chave grátis de cada provedor: **Ajustes → IA → "Como conseguir grátis?"** (rota `/ajustes/tutorial-chaves`).
+
+As chaves ficam salvas **somente no seu dispositivo** (IndexedDB) e as chamadas vão direto do navegador para o provedor. A interface (`src/llm/client.ts`) abstrai os três formatos de API; o fallback vive em `src/llm/fallback.ts`. Toda resposta é pedida em JSON mode e **validada no cliente** (schema + enum canônico de músculos + equipamentos disponíveis) com até 2 tentativas de correção por chave; se falhar, o app orienta a edição manual.
 
 ## Arquitetura
 
