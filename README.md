@@ -33,6 +33,24 @@ O próprio app tem um **tutorial passo a passo** de como criar a chave grátis d
 
 As chaves ficam salvas **somente no seu dispositivo** (IndexedDB) e as chamadas vão direto do navegador para o provedor. A interface (`src/llm/client.ts`) abstrai os três formatos de API; o fallback vive em `src/llm/fallback.ts`. Toda resposta é pedida em JSON mode e **validada no cliente** (schema + enum canônico de músculos + equipamentos disponíveis) com até 2 tentativas de correção por chave; se falhar, o app orienta a edição manual.
 
+## Login e sincronização entre dispositivos (opcional, via Supabase)
+
+O app continua **offline-first**: tudo funciona sem conta e sem internet, com os dados no IndexedDB. Opcionalmente, você pode ligar a sincronização com um projeto **Supabase** (free tier) para ter backup na nuvem e usar o mesmo histórico em vários aparelhos:
+
+1. Crie um projeto grátis em [supabase.com](https://supabase.com).
+2. No **SQL Editor** do projeto, rode o conteúdo de [`supabase/schema.sql`](supabase/schema.sql) — cria a tabela `sync_registros` com RLS (cada usuário só acessa as próprias linhas).
+3. Para "Entrar com Google", ative o provedor Google em **Authentication → Sign In / Up** (o login por e-mail com link mágico já vem ativo).
+4. No app, abra **Ajustes → Conta e sincronização** e cole a *Project URL* e a *anon public key* (Settings → API) — ou configure `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY` no build.
+
+O login é **sem senha**: link mágico por e-mail ou conta Google (OAuth/PKCE). A sync roda automaticamente ao logar, ao voltar a rede e após alterações locais (debounce), com resolução de conflitos *last-write-wins* e propagação de exclusões por lápides. As chaves de IA **não** são sincronizadas — ficam em cada dispositivo.
+
+## Mapa de recuperação 2D e 3D
+
+O painel de recuperação tem duas visões (toggle na tela inicial):
+
+- **2D** — silhueta SVG frente/costas, leve e instantânea.
+- **3D** — boneco em three.js que você **gira com o dedo** (OrbitControls), com zoom por pinça e seleção de músculo por toque (raycasting). O three.js é carregado sob demanda (lazy chunk), então quem fica no 2D não baixa nada a mais.
+
 ## Arquitetura
 
 ```
@@ -42,8 +60,9 @@ src/
   data/         ← catálogos semente: equipamentos (academia/calistenia) e exercícios com progressões
   lib/          ← regras do app: corrida periodizada, validação do plano mensal, agregação do relatório,
                   conversão logs → estímulos (corrida e esportes também alimentam o heatmap)
-  llm/          ← prompts de sistema, cliente multi-provedor, validação do JSON
-  components/   ← BodyMap (heatmap SVG frente/costas), timer de descanso, UI
+  llm/          ← prompts de sistema, cliente multi-provedor + fallback, validação do JSON
+  sync/         ← cliente Supabase opcional + motor de sincronização offline-first
+  components/   ← BodyMap (SVG 2D), BodyMap3D (three.js), timer de descanso, UI
   pages/        ← telas (Hoje, Treinos, Plano, Corrida, Registros, Histórico, Relatório, Ajustes)
 ```
 

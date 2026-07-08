@@ -32,6 +32,18 @@ export default function AjustesPage() {
         <h1 className="text-xl font-bold">Ajustes</h1>
       </header>
 
+      <Secao titulo="Conta e sincronização">
+        <Link to="/conta" className="card flex items-center justify-between hover:border-slate-600">
+          <div>
+            <p className="text-sm font-semibold">Login e backup na nuvem</p>
+            <p className="text-xs text-slate-400">
+              Entre com e-mail (link mágico) ou Google para sincronizar entre dispositivos.
+            </p>
+          </div>
+          <span className="text-slate-500">›</span>
+        </Link>
+      </Secao>
+
       <Secao titulo="Perfil">
         <div className="card">
           <label>
