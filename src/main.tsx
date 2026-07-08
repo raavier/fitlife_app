@@ -3,9 +3,11 @@ import { createRoot } from 'react-dom/client';
 import { HashRouter } from 'react-router-dom';
 import { registerSW } from 'virtual:pwa-register';
 import App from './App';
+import { iniciarAutoSync } from './sync/engine';
 import './index.css';
 
 registerSW({ immediate: true });
+iniciarAutoSync();
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

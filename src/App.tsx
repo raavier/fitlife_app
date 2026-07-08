@@ -11,6 +11,8 @@ import CorridaPage from './pages/CorridaPage';
 import HistoricoPage from './pages/HistoricoPage';
 import RelatorioPage from './pages/RelatorioPage';
 import AjustesPage from './pages/AjustesPage';
+import TutorialChavesPage from './pages/TutorialChavesPage';
+import ContaPage from './pages/ContaPage';
 
 const ABAS = [
   { para: '/', rotulo: 'Hoje', icone: '🏠' },
@@ -37,6 +39,8 @@ export default function App() {
           <Route path="/historico" element={<HistoricoPage />} />
           <Route path="/relatorio" element={<RelatorioPage />} />
           <Route path="/ajustes" element={<AjustesPage />} />
+          <Route path="/ajustes/tutorial-chaves" element={<TutorialChavesPage />} />
+          <Route path="/conta" element={<ContaPage />} />
         </Routes>
       </main>
       <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-slate-800 bg-slate-950/95 backdrop-blur">

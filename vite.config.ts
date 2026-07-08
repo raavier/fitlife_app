@@ -3,7 +3,12 @@ import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
+// No GitHub Pages o app vive num subcaminho (https://usuario.github.io/fitlife_app/).
+// O workflow de deploy define BASE_PATH=/fitlife_app/; localmente fica '/'.
+const base = process.env.BASE_PATH ?? '/';
+
 export default defineConfig({
+  base,
   plugins: [
     react(),
     tailwindcss(),
@@ -20,7 +25,8 @@ export default defineConfig({
         orientation: 'portrait',
         theme_color: '#0f172a',
         background_color: '#0f172a',
-        start_url: '/',
+        start_url: base,
+        scope: base,
         icons: [
           { src: 'icon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any' },
           { src: 'icon-192.png', sizes: '192x192', type: 'image/png' },

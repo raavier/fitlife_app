@@ -2,6 +2,21 @@
 // Nada aqui redefine o enum de músculos — sempre importar de ../domain.
 import type { Modalidade, Musculo, Nivel, Objetivo, Secundario } from '../domain';
 
+/** Campos de sincronização presentes em toda tabela sincronizável. */
+export interface Sincronizavel {
+  /** id estável entre dispositivos (o id numérico do Dexie é só local) */
+  uuid?: string;
+  /** epoch ms da última modificação local — base do last-write-wins */
+  updatedEm?: number;
+}
+
+/** Lápide: registra exclusões para propagá-las aos outros dispositivos. */
+export interface Tombstone {
+  tabela: string;
+  uuid: string;
+  apagadoEm: number;
+}
+
 /** Modalidade ampliada do log (o domínio só conhece academia/calistenia). */
 export type ModalidadeApp = 'academia' | 'calistenia' | 'corrida' | 'extra';
 
@@ -32,7 +47,7 @@ export interface ExercicioFicha {
   observacao?: string;
 }
 
-export interface Ficha {
+export interface Ficha extends Sincronizavel {
   id?: number;
   nome: string;
   modalidade: Modalidade;
@@ -66,7 +81,7 @@ export interface AtividadeExtraExecutada {
 }
 
 /** Log unificado de tudo que foi feito (alimenta heatmap, volume e relatório). */
-export interface LogTreino {
+export interface LogTreino extends Sincronizavel {
   id?: number;
   timestamp: number;
   modalidade: ModalidadeApp;
@@ -100,7 +115,7 @@ export interface SemanaPlano {
   dias: DiaPlano[];
 }
 
-export interface PlanoMensal {
+export interface PlanoMensal extends Sincronizavel {
   id?: number;
   inicio: string;
   observacoes?: string;
@@ -127,7 +142,7 @@ export interface SemanaCorrida {
   sessoes: SessaoCorridaPlanejada[];
 }
 
-export interface PlanoCorrida {
+export interface PlanoCorrida extends Sincronizavel {
   id?: number;
   meta: string;
   dataAlvo?: string;
@@ -140,7 +155,7 @@ export interface PlanoCorrida {
 }
 
 /** Esporte cadastrado pelo usuário fora do SPORT_MAP, com mapeamento manual. */
-export interface EsporteCustom {
+export interface EsporteCustom extends Sincronizavel {
   id?: number;
   tipo: string;
   nome: string;
@@ -158,4 +173,15 @@ export interface LlmConfig {
   provider: LlmProviderId;
   apiKey: string;
   model: string;
+}
+
+/**
+ * Uma chave na lista de fallback: o app tenta na ordem e,
+ * se uma falhar (rate limit, chave inválida, rede), passa para a próxima.
+ */
+export interface LlmKeyEntry {
+  id: string;
+  provider: LlmProviderId;
+  apiKey: string;
+  model: string; // '' = modelo padrão do provedor
 }

@@ -1,8 +1,11 @@
 // Tela inicial: painel de recuperação (heatmap) + sessão de hoje + ações rápidas.
-import { useMemo, useState } from 'react';
+import { lazy, Suspense, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import BodyMap from '../components/BodyMap';
-import { Aviso, Secao } from '../components/ui';
+import { Aviso, Carregando, Secao } from '../components/ui';
+
+// three.js só é baixado quando o usuário abre a visão 3D
+const BodyMap3D = lazy(() => import('../components/BodyMap3D'));
 import { alvoVolume, statusVolume, type Musculo } from '../domain';
 import {
   useKmSemanais,
@@ -24,6 +27,12 @@ export default function HomePage() {
   const plano = usePlanoMensal();
   const kmSemanas = useKmSemanais(4);
   const [selecionado, setSelecionado] = useState<Musculo | null>(null);
+  const [visao3d, setVisao3d] = useState(() => localStorage.getItem('fitlife_mapa3d') === '1');
+
+  function alternarVisao(v: boolean) {
+    setVisao3d(v);
+    localStorage.setItem('fitlife_mapa3d', v ? '1' : '0');
+  }
 
   const hoje = isoHoje();
   const diaHoje = plano ? diaDoPlano(plano, hoje) : undefined;
@@ -151,11 +160,35 @@ export default function HomePage() {
         </Secao>
       )}
 
-      <Secao titulo="Recuperação muscular">
+      <Secao
+        titulo="Recuperação muscular"
+        acao={
+          <div className="flex rounded-lg border border-slate-700 p-0.5 text-xs">
+            <button
+              className={`rounded-md px-2.5 py-1 font-semibold ${!visao3d ? 'bg-slate-700 text-slate-100' : 'text-slate-500'}`}
+              onClick={() => alternarVisao(false)}
+            >
+              2D
+            </button>
+            <button
+              className={`rounded-md px-2.5 py-1 font-semibold ${visao3d ? 'bg-emerald-500/30 text-emerald-200' : 'text-slate-500'}`}
+              onClick={() => alternarVisao(true)}
+            >
+              3D
+            </button>
+          </div>
+        }
+      >
         <div className="card">
           {recuperacao ? (
             <>
-              <BodyMap estados={recuperacao} selecionado={selecionado} onSelect={setSelecionado} />
+              {visao3d ? (
+                <Suspense fallback={<Carregando texto="Carregando visualização 3D…" />}>
+                  <BodyMap3D estados={recuperacao} selecionado={selecionado} onSelect={setSelecionado} />
+                </Suspense>
+              ) : (
+                <BodyMap estados={recuperacao} selecionado={selecionado} onSelect={setSelecionado} />
+              )}
               {detalhe && selecionado && (
                 <div className="mt-3 rounded-xl bg-slate-800/70 p-3 text-sm">
                   <div className="mb-1 flex items-center justify-between">
