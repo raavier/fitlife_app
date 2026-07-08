@@ -33,6 +33,22 @@ O próprio app tem um **tutorial passo a passo** de como criar a chave grátis d
 
 As chaves ficam salvas **somente no seu dispositivo** (IndexedDB) e as chamadas vão direto do navegador para o provedor. A interface (`src/llm/client.ts`) abstrai os três formatos de API; o fallback vive em `src/llm/fallback.ts`. Toda resposta é pedida em JSON mode e **validada no cliente** (schema + enum canônico de músculos + equipamentos disponíveis) com até 2 tentativas de correção por chave; se falhar, o app orienta a edição manual.
 
+## Hospedagem grátis (GitHub Pages)
+
+O app é 100% estático — não precisa de servidor. O deploy no **GitHub Pages** já está automatizado em [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml): a cada push na branch `master`, o workflow roda os testes, faz o build e publica.
+
+**Para ativar (uma vez só):**
+
+1. No GitHub, abra **Settings → Pages** do repositório e em *Build and deployment* → *Source* escolha **GitHub Actions**.
+2. Faça merge desta branch na `master` (ou rode o workflow manualmente em *Actions → Deploy no GitHub Pages → Run workflow*).
+3. O app fica no ar em `https://<seu-usuario>.github.io/fitlife_app/` — instalável como PWA direto do navegador do celular.
+
+O build do Pages usa `BASE_PATH=/fitlife_app/` (o workflow deduz do nome do repositório); localmente nada muda (`npm run dev` continua em `/`).
+
+**Se for usar o login/sync:** depois de publicado, adicione a URL do Pages no seu projeto Supabase em **Authentication → URL Configuration** (Site URL e Redirect URLs) — senão o link mágico e o Google redirecionam para o endereço errado.
+
+**Alternativas** igualmente grátis, se preferir domínio mais limpo: Netlify, Vercel ou Cloudflare Pages — em todos, basta apontar para o repo com build `npm run build` e diretório `dist` (sem `BASE_PATH`, pois servem na raiz).
+
 ## Login e sincronização entre dispositivos (opcional, via Supabase)
 
 O app continua **offline-first**: tudo funciona sem conta e sem internet, com os dados no IndexedDB. Opcionalmente, você pode ligar a sincronização com um projeto **Supabase** (free tier) para ter backup na nuvem e usar o mesmo histórico em vários aparelhos:
