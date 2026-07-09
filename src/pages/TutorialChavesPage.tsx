@@ -56,6 +56,43 @@ const TUTORIAIS: Tutorial[] = [
     dica: 'Ótima segunda opção: rápido e estável quando o Gemini atingir o limite.',
   },
   {
+    emoji: '🚀',
+    nome: 'Cerebras',
+    url: 'https://cloud.cerebras.ai',
+    urlRotulo: 'cloud.cerebras.ai',
+    prefixo: 'csk-…',
+    passos: [
+      'Acesse cloud.cerebras.ai e crie a conta (Google ou e-mail). Sem cartão.',
+      'No painel, abra "API Keys" → "Create API Key" e dê um nome.',
+      'Copie a chave e cole no app em Ajustes → IA → Adicionar chave (provedor Cerebras).',
+    ],
+    freeTier: [
+      'Free tier gigante: cerca de 1 milhão de tokens POR DIA (Llama 3.3 70B), ~30 requisições/minuto.',
+      'Hardware próprio ultrarrápido — respostas quase instantâneas.',
+      'Não pede cartão de crédito.',
+    ],
+    dica: 'Provavelmente o melhor custo-benefício da lista — ótima 1ª ou 2ª posição na fila.',
+  },
+  {
+    emoji: '🌬️',
+    nome: 'Mistral (La Plateforme)',
+    url: 'https://console.mistral.ai',
+    urlRotulo: 'console.mistral.ai',
+    prefixo: '(chave alfanumérica)',
+    passos: [
+      'Acesse console.mistral.ai e crie a conta.',
+      'Escolha o plano "Experiment" (o gratuito) — ele pede verificação por telefone e aceite de que os dados podem ser usados para treino.',
+      'Abra "API Keys" → "Create new key" e copie a chave.',
+      'Cole no app em Ajustes → IA → Adicionar chave (provedor Mistral).',
+    ],
+    freeTier: [
+      'Cerca de 1 bilhão de tokens/mês no plano Experiment — de longe a maior cota mensal.',
+      'Em troca, seus prompts podem ser usados para treinar os modelos deles (evite dados sensíveis).',
+      'Sem cartão de crédito.',
+    ],
+    dica: 'A cota mensal enorme faz dele um excelente reserva para o fim da fila.',
+  },
+  {
     emoji: '🔀',
     nome: 'OpenRouter',
     url: 'https://openrouter.ai/settings/keys',
@@ -63,16 +100,17 @@ const TUTORIAIS: Tutorial[] = [
     prefixo: 'sk-or-…',
     passos: [
       'Acesse openrouter.ai e clique em "Sign up" (pode usar Google ou GitHub).',
-      'Depois de logado, abra o menu do perfil → "Keys" (ou vá direto em openrouter.ai/settings/keys).',
-      'Clique em "Create Key", dê um nome e deixe o limite de crédito em branco.',
+      'IMPORTANTE: em Settings → Privacy, ative a opção de usar endpoints gratuitos ("free endpoints" / model training) — sem isso os modelos :free são bloqueados.',
+      'Abra o menu do perfil → "Keys" → "Create Key", dê um nome e deixe o limite de crédito em branco.',
       'Copie a chave e cole no app em Ajustes → IA → Adicionar chave.',
+      'Use SOMENTE modelos com sufixo ":free" (o padrão do app já é um) — sem o sufixo o modelo é pago e dá erro de créditos.',
     ],
     freeTier: [
-      'Não pede cartão para usar os modelos gratuitos.',
-      'Use modelos com sufixo ":free" — o padrão do app já é um deles (meta-llama/llama-3.3-70b-instruct:free).',
-      'Modelos :free têm limite diário baixo de requisições — bom como última opção da fila.',
+      'Grátis, mas o mais limitado dos cinco: 20 requisições/minuto e só 50 requisições/DIA.',
+      'Se um dia você comprar US$10 de créditos (uma única vez, não expiram), o limite diário sobe para 1000 para sempre.',
+      'Erro "requires more credits" (402) = modelo sem ":free" no nome ou saldo negativo.',
     ],
-    dica: 'Funciona como um "hub": se quiser testar outro modelo grátis, é só trocar o campo modelo da chave.',
+    dica: 'Deixe como última opção da fila — os outros quatro têm cotas bem maiores.',
   },
 ];
 

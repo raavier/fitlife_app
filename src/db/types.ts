@@ -167,7 +167,7 @@ export interface ConfigItem {
   valor: unknown;
 }
 
-export type LlmProviderId = 'gemini' | 'groq' | 'openrouter';
+export type LlmProviderId = 'gemini' | 'groq' | 'openrouter' | 'cerebras' | 'mistral';
 
 export interface LlmConfig {
   provider: LlmProviderId;
