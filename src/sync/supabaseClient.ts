@@ -7,10 +7,23 @@ import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 const LS_URL = 'fitlife_supabase_url';
 const LS_KEY = 'fitlife_supabase_anon_key';
 
+// Projeto padrão do app publicado — o usuário final não configura nada.
+// A anon key é pública por design: a proteção dos dados vem das políticas
+// RLS por usuário (supabase/schema.sql). Quem fizer fork troca estes valores
+// (ou usa VITE_SUPABASE_URL/VITE_SUPABASE_ANON_KEY, que têm prioridade).
+const PADRAO_URL = 'https://nhelgsqyuxjbzpxluokq.supabase.co';
+const PADRAO_ANON_KEY =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5oZWxnc3F5dXhqYnpweGx1b2txIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM1NDY2ODMsImV4cCI6MjA5OTEyMjY4M30.R-kALRogXkdUK7He9yRqyPmLbRlmp9K0DeznrBaIwGM';
+
 export function supabaseConfig(): { url: string; anonKey: string } | null {
-  const url = (import.meta.env.VITE_SUPABASE_URL as string | undefined) || localStorage.getItem(LS_URL) || '';
+  const url =
+    (import.meta.env.VITE_SUPABASE_URL as string | undefined) ||
+    localStorage.getItem(LS_URL) ||
+    PADRAO_URL;
   const anonKey =
-    (import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined) || localStorage.getItem(LS_KEY) || '';
+    (import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined) ||
+    localStorage.getItem(LS_KEY) ||
+    PADRAO_ANON_KEY;
   if (!url || !anonKey) return null;
   return { url, anonKey };
 }
