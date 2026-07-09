@@ -177,6 +177,8 @@ export interface ParamsGeracaoFicha {
   /** itens do catálogo que o usuário NÃO tem — listados como proibidos no prompt */
   equipamentosIndisponiveis?: string[];
   foco?: string;
+  /** bloco de contexto do atleta (recuperação/volume/último treino), calculado pelo app */
+  contexto?: string;
 }
 
 function blocoIndisponiveis(p: ParamsGeracaoFicha): string {
@@ -193,7 +195,7 @@ tempo_min: ${p.tempoMin}
 nivel: ${p.nivel}
 restricoes: ${p.restricoes || 'nenhuma'}
 equipamentos_disponiveis: ${JSON.stringify(p.equipamentos)}${blocoIndisponiveis(p)}
-foco_do_dia: ${p.foco || 'a seu critério, coerente com a divisão'}`;
+foco_do_dia: ${p.foco || 'a seu critério, coerente com a divisão'}${p.contexto ? `\n\n${p.contexto}` : ''}`;
 }
 
 export function userPromptCalistenia(p: ParamsGeracaoFicha): string {
@@ -205,7 +207,7 @@ tempo_min: ${p.tempoMin}
 nivel: ${p.nivel}
 restricoes: ${p.restricoes || 'nenhuma'}
 equipamentos_disponiveis: ${JSON.stringify(p.equipamentos)}${blocoIndisponiveis(p)}
-foco_do_dia: ${p.foco || 'a seu critério, coerente com a divisão'}`;
+foco_do_dia: ${p.foco || 'a seu critério, coerente com a divisão'}${p.contexto ? `\n\n${p.contexto}` : ''}`;
 }
 
 export interface ParamsPlanoMensal {
@@ -216,6 +218,8 @@ export interface ParamsPlanoMensal {
   nivel: string;
   restricoes: string;
   preferencias: string;
+  /** bloco de contexto do atleta (recuperação/km recentes), calculado pelo app */
+  contexto?: string;
 }
 
 export function userPromptPlanoMensal(p: ParamsPlanoMensal): string {
@@ -226,7 +230,7 @@ dias_disponiveis: ${JSON.stringify(p.diasDisponiveis)}
 meta_corrida: ${p.metaCorrida || 'sem prova, manutenção'}
 nivel: ${p.nivel}
 restricoes: ${p.restricoes || 'nenhuma'}
-preferencias: ${p.preferencias || 'nenhuma'}`;
+preferencias: ${p.preferencias || 'nenhuma'}${p.contexto ? `\n\n${p.contexto}` : ''}`;
 }
 
 export function userPromptRelatorio(payload: {

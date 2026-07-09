@@ -1,6 +1,6 @@
 // Hooks reativos sobre o Dexie (liveQuery) — o coração dos dados na UI.
 import { useLiveQuery } from 'dexie-react-hooks';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { db } from '../db/db';
 import type { LogTreino, PlanoMensal } from '../db/types';
 import { logsParaEstimulos } from '../lib/estimulos';
@@ -31,15 +31,23 @@ export function useEstimulos(): Estimulo[] | undefined {
 
 export function useRecuperacao(): Partial<Record<Musculo, RecuperacaoMusculo>> | undefined {
   const estimulos = useEstimulos();
+  // tick por minuto: a fadiga decai com o tempo, então o heatmap "alivia"
+  // sozinho mesmo com a tela aberta parada.
+  const [tick, setTick] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setTick((t) => t + 1), 60_000);
+    return () => clearInterval(id);
+  }, []);
   return useMemo(() => {
     if (!estimulos) return undefined;
+    void tick;
     const agora = Date.now();
     const out: Partial<Record<Musculo, RecuperacaoMusculo>> = {};
     for (const m of MUSCULOS) {
       out[m] = recuperacaoDoMusculo(m, estimulos, agora);
     }
     return out;
-  }, [estimulos]);
+  }, [estimulos, tick]);
 }
 
 /** Volume da semana corrente (começando na segunda-feira). */
