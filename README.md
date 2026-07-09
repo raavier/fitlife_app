@@ -51,7 +51,9 @@ O build do Pages usa `BASE_PATH=/fitlife_app/` (o workflow deduz do nome do repo
 
 ## Login e sincronização entre dispositivos (opcional, via Supabase)
 
-O app continua **offline-first**: tudo funciona sem conta e sem internet, com os dados no IndexedDB. Opcionalmente, você pode ligar a sincronização com um projeto **Supabase** (free tier) para ter backup na nuvem e usar o mesmo histórico em vários aparelhos:
+O app continua **offline-first**: tudo funciona sem conta e sem internet, com os dados no IndexedDB. Com login (link mágico por e-mail ou Google), os dados sincronizam com a nuvem para backup e uso em vários aparelhos.
+
+**Para o usuário final não há configuração nenhuma:** o app publicado já vem conectado ao projeto Supabase do dono (constantes em `src/sync/supabaseClient.ts`) — a aba Conta mostra direto o login. Quem fizer **fork** do projeto troca essas constantes pelas do próprio projeto (ou define `VITE_SUPABASE_URL`/`VITE_SUPABASE_ANON_KEY` no build, que têm prioridade), seguindo os passos:
 
 1. Crie um projeto grátis em [supabase.com](https://supabase.com).
 2. No **SQL Editor** do projeto, rode o conteúdo de [`supabase/schema.sql`](supabase/schema.sql) — cria a tabela `sync_registros` com RLS (cada usuário só acessa as próprias linhas).
