@@ -13,6 +13,51 @@ function exigir(cond: boolean, msg: string): asserts cond {
   if (!cond) throw new ValidacaoError(msg);
 }
 
+/**
+ * Checagem SEMÂNTICA de equipamento: modelos free às vezes "contrabandeiam"
+ * um exercício rotulando-o com um equipamento permitido (ex.: "Barra Fixa"
+ * com equipamento "banco"). Se o NOME do movimento denuncia um requisito,
+ * exigimos que ao menos um dos equipamentos capazes esteja disponível.
+ */
+const REQUISITOS_POR_NOME: { padrao: RegExp; rotulo: string; capazes: string[] }[] = [
+  {
+    padrao: /barra\s*fixa|pull[\s-]?up|chin[\s-]?up|muscle[\s-]?up|front\s*lever|puxada|pendur/i,
+    rotulo: 'uma barra para se pendurar',
+    capazes: ['barra_fixa', 'barras_praca', 'argolas', 'trx', 'barra_fixa_academia', 'puxada_frente', 'puxada_aberta'],
+  },
+  {
+    padrao: /remada\s*australiana|remada\s*invertida|body\s*row/i,
+    rotulo: 'uma barra baixa, TRX ou argolas',
+    capazes: ['barra_fixa', 'barras_praca', 'argolas', 'trx', 'trx_academia'],
+  },
+  {
+    padrao: /\bdips?\b|paralela|mergulho/i,
+    rotulo: 'paralelas, banco, argolas ou barras',
+    capazes: ['paralelas', 'banco', 'argolas', 'barras_praca', 'paralelas_academia', 'banco_ajustavel'],
+  },
+  {
+    padrao: /argola/i,
+    rotulo: 'argolas',
+    capazes: ['argolas'],
+  },
+  {
+    padrao: /corda\s*de\s*pular|pular\s*corda/i,
+    rotulo: 'corda de pular',
+    capazes: ['corda_pular'],
+  },
+];
+
+export function equipamentoImplicitoFaltando(
+  nomeExercicio: string,
+  equipamentosDisponiveis: string[],
+): string | null {
+  for (const req of REQUISITOS_POR_NOME) {
+    if (!req.padrao.test(nomeExercicio)) continue;
+    if (!req.capazes.some((id) => equipamentosDisponiveis.includes(id))) return req.rotulo;
+  }
+  return null;
+}
+
 const FAIXAS_DESCANSO: Record<string, { min: number; max: number }> = {
   forca: { min: 90, max: 330 },
   hipertrofia: { min: 45, max: 210 },
@@ -52,6 +97,11 @@ export function validarFichaLlm(
     exigir(
       equipamentosDisponiveis.includes(e.equipamento as string),
       `${rotulo}: equipamento "${String(e.equipamento)}" não está em equipamentos_disponiveis (${equipamentosDisponiveis.join(', ')}).`,
+    );
+    const faltando = equipamentoImplicitoFaltando(String(e.nome), equipamentosDisponiveis);
+    exigir(
+      faltando === null,
+      `${rotulo}: este movimento exige ${faltando}, que NÃO está em equipamentos_disponiveis. Substitua por um exercício que use somente: ${equipamentosDisponiveis.join(', ')}.`,
     );
     exigir(
       typeof e.musculo_primario === 'string' && isMusculo(e.musculo_primario),
