@@ -6,12 +6,24 @@ export const MODELOS_PADRAO: Record<LlmProviderId, string> = {
   gemini: 'gemini-2.0-flash',
   groq: 'llama-3.3-70b-versatile',
   openrouter: 'meta-llama/llama-3.3-70b-instruct:free',
+  cerebras: 'llama-3.3-70b',
+  mistral: 'mistral-small-latest',
 };
 
 export const NOME_PROVEDOR: Record<LlmProviderId, string> = {
   gemini: 'Google Gemini',
   groq: 'Groq',
   openrouter: 'OpenRouter',
+  cerebras: 'Cerebras',
+  mistral: 'Mistral',
+};
+
+/** Endpoints OpenAI-compatíveis (todos menos o Gemini falam esse formato). */
+const URL_OPENAI_COMPAT: Partial<Record<LlmProviderId, string>> = {
+  groq: 'https://api.groq.com/openai/v1/chat/completions',
+  openrouter: 'https://openrouter.ai/api/v1/chat/completions',
+  cerebras: 'https://api.cerebras.ai/v1/chat/completions',
+  mistral: 'https://api.mistral.ai/v1/chat/completions',
 };
 
 export class LlmError extends Error {
@@ -62,11 +74,9 @@ export async function chamarLlm(
     return texto;
   }
 
-  // Groq e OpenRouter falam o formato OpenAI-compatível.
-  const url =
-    cfg.provider === 'groq'
-      ? 'https://api.groq.com/openai/v1/chat/completions'
-      : 'https://openrouter.ai/api/v1/chat/completions';
+  // Demais provedores falam o formato OpenAI-compatível.
+  const url = URL_OPENAI_COMPAT[cfg.provider];
+  if (!url) throw new LlmError(`Provedor desconhecido: ${cfg.provider}`);
 
   const res = await fetch(url, {
     method: 'POST',
@@ -104,6 +114,17 @@ async function erroHttp(res: Response): Promise<LlmError> {
   }
   if (res.status === 401 || res.status === 403) {
     return new LlmError('Chave da API inválida ou sem permissão. Verifique em Ajustes.');
+  }
+  // Erros típicos do OpenRouter em modelos :free
+  if (res.status === 402) {
+    return new LlmError(
+      'O provedor pediu créditos (402). Confira se o modelo termina em ":free" (OpenRouter) — modelos pagos exigem saldo.',
+    );
+  }
+  if (res.status === 404 && /data policy/i.test(detalhe)) {
+    return new LlmError(
+      'O OpenRouter bloqueou os modelos gratuitos pela sua configuração de privacidade. Em openrouter.ai → Settings → Privacy, ative "Enable free endpoints" / model training e tente de novo.',
+    );
   }
   return new LlmError(`Erro do provedor (${res.status}): ${detalhe}`);
 }

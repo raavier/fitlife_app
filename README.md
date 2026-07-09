@@ -21,11 +21,13 @@ O app é instalável como PWA (manifest + service worker via `vite-plugin-pwa`) 
 
 A geração por IA usa provedores de **free tier**, configuráveis dentro do app em **Ajustes → IA**:
 
-| Provedor | Onde pegar a chave | Modelo padrão |
-| --- | --- | --- |
-| Google Gemini | [aistudio.google.com](https://aistudio.google.com) | `gemini-2.0-flash` |
-| Groq | [console.groq.com](https://console.groq.com) | `llama-3.3-70b-versatile` |
-| OpenRouter | [openrouter.ai](https://openrouter.ai) | `meta-llama/llama-3.3-70b-instruct:free` |
+| Provedor | Onde pegar a chave | Modelo padrão | Free tier (jul/2026) |
+| --- | --- | --- | --- |
+| Google Gemini | [aistudio.google.com](https://aistudio.google.com) | `gemini-2.0-flash` | cota diária generosa |
+| Groq | [console.groq.com](https://console.groq.com) | `llama-3.3-70b-versatile` | limites por minuto/dia |
+| Cerebras | [cloud.cerebras.ai](https://cloud.cerebras.ai) | `llama-3.3-70b` | ~1M tokens/dia |
+| Mistral | [console.mistral.ai](https://console.mistral.ai) | `mistral-small-latest` | ~1B tokens/mês (Experiment, opt-in de treino) |
+| OpenRouter | [openrouter.ai](https://openrouter.ai) | `meta-llama/llama-3.3-70b-instruct:free` | 50 req/dia (1000 após compra única de US$10); exige ativar free endpoints na privacidade |
 
 Você pode cadastrar **várias chaves** (inclusive de provedores diferentes) numa **fila de fallback**: o app tenta na ordem e, se uma chave falhar — limite de tokens do dia esgotado, rate limit, chave inválida ou erro de rede — passa automaticamente para a próxima. Só dá erro se todas falharem, e a mensagem informa o motivo de cada uma.
 
