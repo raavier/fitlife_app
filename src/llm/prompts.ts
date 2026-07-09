@@ -174,7 +174,14 @@ export interface ParamsGeracaoFicha {
   nivel: string;
   restricoes: string;
   equipamentos: string[];
+  /** itens do catálogo que o usuário NÃO tem — listados como proibidos no prompt */
+  equipamentosIndisponiveis?: string[];
   foco?: string;
+}
+
+function blocoIndisponiveis(p: ParamsGeracaoFicha): string {
+  if (!p.equipamentosIndisponiveis?.length) return '';
+  return `\nequipamentos_INDISPONIVEIS (PROIBIDO prescrever qualquer exercício que dependa deles, mesmo com adaptação): ${JSON.stringify(p.equipamentosIndisponiveis)}`;
 }
 
 export function userPromptFicha(p: ParamsGeracaoFicha): string {
@@ -185,7 +192,7 @@ frequencia_semanal: ${p.frequencia}
 tempo_min: ${p.tempoMin}
 nivel: ${p.nivel}
 restricoes: ${p.restricoes || 'nenhuma'}
-equipamentos_disponiveis: ${JSON.stringify(p.equipamentos)}
+equipamentos_disponiveis: ${JSON.stringify(p.equipamentos)}${blocoIndisponiveis(p)}
 foco_do_dia: ${p.foco || 'a seu critério, coerente com a divisão'}`;
 }
 
@@ -197,7 +204,7 @@ frequencia_semanal: ${p.frequencia}
 tempo_min: ${p.tempoMin}
 nivel: ${p.nivel}
 restricoes: ${p.restricoes || 'nenhuma'}
-equipamentos_disponiveis: ${JSON.stringify(p.equipamentos)}
+equipamentos_disponiveis: ${JSON.stringify(p.equipamentos)}${blocoIndisponiveis(p)}
 foco_do_dia: ${p.foco || 'a seu critério, coerente com a divisão'}`;
 }
 

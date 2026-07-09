@@ -60,6 +60,8 @@ export default function GerarFichaPage() {
         nivel,
         restricoes,
         equipamentos,
+        // o que ficou desmarcado vira proibição explícita no prompt
+        equipamentosIndisponiveis: catalogo.map((e) => e.id).filter((id) => !equipamentos.includes(id)),
         foco: foco || undefined,
       };
       const { ficha, avisos } = ehAcademia
