@@ -7,6 +7,7 @@ import { EQUIPAMENTOS_ACADEMIA, EQUIPAMENTOS_CALISTENIA } from '../data/equipame
 import { db, getConfig, setConfig } from '../db/db';
 import type { Ficha } from '../db/types';
 import { gerarFichaAcademia, gerarTreinoCalistenia } from '../llm';
+import { avisosFichaVsRecuperacao, contextoParaFicha } from '../lib/contextoIA';
 import { NOME_MUSCULO } from '../lib/labels';
 
 export default function GerarFichaPage() {
@@ -52,7 +53,10 @@ export default function GerarFichaPage() {
     setGerando(true);
     try {
       await setConfig(`equipamentos_${modalidade}`, equipamentos);
+      // contexto real do atleta (recuperação, volume, último treino do tipo)
+      const contexto = await contextoParaFicha(modalidade === 'academia' ? 'academia' : 'calistenia');
       const params = {
+        contexto: contexto.texto,
         objetivo,
         divisao,
         frequencia,
@@ -68,7 +72,7 @@ export default function GerarFichaPage() {
         ? await gerarFichaAcademia(params)
         : await gerarTreinoCalistenia(params);
       setPreview(ficha);
-      setAvisos(avisos);
+      setAvisos([...avisos, ...avisosFichaVsRecuperacao(ficha, contexto.recuperacoes)]);
     } catch (e) {
       setErro(e instanceof Error ? e.message : String(e));
     } finally {

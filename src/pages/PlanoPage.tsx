@@ -7,6 +7,7 @@ import { Aviso, Carregando, Secao } from '../components/ui';
 import { db, getConfig } from '../db/db';
 import type { DiaPlano, ModalidadePlano, PlanoMensal } from '../db/types';
 import { gerarPlanoMensalLlm } from '../llm';
+import { contextoParaPlanoMensal } from '../lib/contextoIA';
 import { COR_MODALIDADE, dataBR, DIAS_SEMANA, isoHoje, NOME_DIA, NOME_MODALIDADE } from '../lib/labels';
 import { validarPlanoMensal } from '../lib/planoMensal';
 
@@ -77,6 +78,7 @@ function FormNovoPlano({ onPronto, onCancelar }: { onPronto: () => void; onCance
     setGerando(true);
     try {
       const nivel = await getConfig<string>('nivel', 'intermediario');
+      const contexto = await contextoParaPlanoMensal();
       const p = await gerarPlanoMensalLlm({
         inicio,
         freq: { corrida: freqCorrida, academia: freqAcademia, calistenia: freqCalistenia },
@@ -85,6 +87,7 @@ function FormNovoPlano({ onPronto, onCancelar }: { onPronto: () => void; onCance
         nivel,
         restricoes,
         preferencias,
+        contexto,
       });
       // Validação das regras de domínio (além do schema, já validado na camada LLM)
       const { erros, avisos } = validarPlanoMensal(p, dias);
